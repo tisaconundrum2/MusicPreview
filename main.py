@@ -1,7 +1,7 @@
 import json
 import requests
 import time
-import vlc
+import os
 
 # Search query goes in the input
 print("Please input song query: ", end="")
@@ -28,26 +28,12 @@ artworkURL = artworkURL.replace("30x30bb.jpg","1000x1000bb.jpg")
 # No way to display the artwork right now
 print(artworkURL)
 
-# Plays the song preview
-player = vlc.MediaPlayer(previewURL)
-volume = 0
-player.audio_set_volume(volume)
-count = 0
-volumeIncrement = 4
-player.play()
+# Download the song preview
+preview_response = requests.get(previewURL)
+preview_response.raise_for_status()
 
-# Song previews are 30 seconds long
-# 5 seconds added for download time
-# time.sleep(35)
+# Save the preview to a file
+with open("song_preview.mp3", "wb") as file:
+    file.write(preview_response.content)
 
-# Fade in fade out
-
-while count < 35:
-    time.sleep(0.10)
-    if count > 2 and count < 5 and volume < 100 - volumeIncrement:
-        volume += volumeIncrement
-        player.audio_set_volume(volume)
-    elif count > 27 and volume > 0:
-        volume -= volumeIncrement
-        player.audio_set_volume(volume)
-    count += 1 * 0.1
+print("Song preview downloaded as 'song_preview.mp3'")
